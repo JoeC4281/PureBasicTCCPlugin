@@ -1,86 +1,110 @@
-; These 4 procedures are Windows specific
-;
+EnableExplicit
 
-; This procedure is called once, when the program loads the library
-; for the first time. All init stuffs can be done here (but not DirectX init)
-;
-ProcedureDLL AttachProcess(Instance)
-EndProcedure
-  
-  
-; Called when the program release (free) the DLL
-;
-ProcedureDLL DetachProcess(Instance)
-EndProcedure
-  
-  
-; Both are called when a thread in a program call or release (free) the DLL
-;
-ProcedureDLL AttachThread(Instance)
-EndProcedure
-  
-ProcedureDLL DetachThread(Instance)
-EndProcedure
+Import ""
+  wprintf.i(format.s)
+EndImport
 
 Structure PLUGININFO_STRUCT
-  pszDll.l
-	pszAuthor.l
-	pszEmail.l
-	pszWWW.l
-	pszDescription.l
-	pszFunctions.l
+    *pszDll
+	*pszAuthor
+	*pszEmail
+	*pszWWW
+	*pszDescription
+	*pszFunctions	
 	nMajor.l
 	nMinor.l
 	nBuild.l
+	hModule.i
+	*pszModule
 EndStructure
 
-ProcedureDLL.l InitializePlugin()
-  OutputDebugString_("InitializePlugin")
+ProcedureDLL.i InitializePlugin()
   ProcedureReturn #Null  
 EndProcedure
 
-ProcedureDLL.l ShutdownPlugin(bEndProcess.b)
-  OutputDebugString_("ShutdownPlugin")
+ProcedureDLL.i ShutdownPlugin(bEndProcess.b)
   ProcedureReturn #Null  
 EndProcedure
 
-ProcedureDLL.l GetPluginInfo()
-  OutputDebugString_("GetPluginInfo")
+ProcedureDLL.i GetPluginInfo()
   Static pi.PLUGININFO_STRUCT
-  Define DLLname.s
-  Define DLLauth.s
-  Define DLLmail.s
-  Define DLLwww.s
-  Define DLLdesc.s
-  Define DLLfuns.s
+  Static DLLname.s
+  Static DLLauth.s
+  Static DLLmail.s
+  Static DLLwww.s
+  Static DLLdesc.s
+  Static DLLfuns.s
   
-  DLLname = "Plugin Dummy"
+  DLLname = "PBPlugin"
   DLLauth = "Joe Caverly"
   DLLmail = "jlcaverlyca@yahoo.ca"
   DLLwww  = "https://www.twitter.com/JoeC4281"
   DLLdesc = "TCC Plugin Template written using Purebasic"
-  DLLfuns = "@Reverse"
+  DLLfuns = "Dummy,@Reverse,@PlusOne,_hello"
   
   pi\pszDll         = @DLLname
   pi\pszAuthor      = @DLLauth
   pi\pszEmail       = @DLLmail
   pi\pszWWW         = @DLLwww
   pi\pszDescription = @DLLdesc
-  pi\pszFunctions   = @DLLfuns
-  
-  pi\nMajor = 2021
-  pi\nMinor = 8
-  pi\nBuild = 7
-  
-  ; How do I return the PluginInfo to TCC?
+  pi\pszFunctions	= @DLLfuns
+  pi\nMajor.l       = 2021
+  pi\nMinor.l       = 08
+  pi\nBuild.l       = 27
+
   ProcedureReturn @pi
 EndProcedure
 
-ProcedureDLL.l f_Reverse(*pstrArgs)
+; Command
+ProcedureDLL.i Dummy(*lpszString)
+  Static theString.s
+  Static theValue.i
   
-  ; How do I get the text from *pstrArgs?
-  ; ReverseString("Stuff") 
-  ; How do I return the reversed string back via *pstrArgs?
+  theString = PeekS(*lpszString)
+  
+  If Len(theString) < 1
+    wprintf("USAGE: Dummy <text>")
+  Else
+    theString = LTrim(RTrim(theString))
+    wprintf(theString)
+  EndIf
+  
+  ProcedureReturn #Null
+EndProcedure
+
+; Function
+ProcedureDLL.i f_Reverse(*lpszString)
+  Static theString.s
+  Static theValue.i
+  
+  theString = PeekS(*lpszString)
+  theString = ReverseString(theString)
+  
+  PokeS(*lpszString,theString)
+  
+  ProcedureReturn #Null
+EndProcedure
+
+; Function
+ProcedureDLL.i f_PlusOne(*lpszString)
+  Static theString.s
+  Static theValue.i
+  
+  theString = PeekS(*lpszString)
+  
+  theValue = Val(theString)
+  theValue = theValue + 1
+  
+  theString = Str(theValue)
+  
+  PokeS(*lpszString,theString)
+  
+  ProcedureReturn #Null
+EndProcedure
+
+; Internal Variable
+ProcedureDLL.i _hello(*lpszString)
+  PokeS(*lpszString,"Hello!")
   
   ProcedureReturn #Null
 EndProcedure
