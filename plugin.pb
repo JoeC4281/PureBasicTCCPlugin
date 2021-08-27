@@ -1,8 +1,26 @@
-; EnableExplicit
+; These 4 procedures are Windows specific
+;
 
-Import ""
-  wprintf.i(format.s)
-EndImport
+; This procedure is called once, when the program loads the library
+; for the first time. All init stuffs can be done here (but not DirectX init)
+;
+ProcedureDLL AttachProcess(Instance)
+EndProcedure
+  
+  
+; Called when the program release (free) the DLL
+;
+ProcedureDLL DetachProcess(Instance)
+EndProcedure
+  
+  
+; Both are called when a thread in a program call or release (free) the DLL
+;
+ProcedureDLL AttachThread(Instance)
+EndProcedure
+  
+ProcedureDLL DetachThread(Instance)
+EndProcedure
 
 Structure PLUGININFO_STRUCT
   pszDll.l
@@ -14,8 +32,6 @@ Structure PLUGININFO_STRUCT
 	nMajor.l
 	nMinor.l
 	nBuild.l
-	hModule.i
-	pszModule.s
 EndStructure
 
 ProcedureDLL.l InitializePlugin()
@@ -60,24 +76,10 @@ ProcedureDLL.l GetPluginInfo()
 EndProcedure
 
 ProcedureDLL.l f_Reverse(*pstrArgs)
-  wprintf("Hello World!\r\n")
-  Define ArgumentString$
   
-;   https://www.purebasic.fr/english/search.php?st=0&sk=t&sd=d&sr=posts&keywords=peeks&start=30  
-  
-;  *pstrArgs.String = @*pstrArgs
-  
-  ArgumentString$ = PeekS(*pstrArgs,256,#PB_Unicode)
-  OutputDebugString_(@ArgumentString$)
-  ArgumentString$ = ReverseString(ArgumentString$)
-  OutputDebugString_(@ArgumentString$)
+  ; How do I get the text from *pstrArgs?
+  ; ReverseString("Stuff") 
+  ; How do I return the reversed string back via *pstrArgs?
   
   ProcedureReturn #Null
 EndProcedure
-
-; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; ExecutableFormat = Shared dll
-; Folding = -
-; EnableXP
-; Executable = test.dll
-; Compiler = PureBasic 5.73 LTS (Windows - x64)
