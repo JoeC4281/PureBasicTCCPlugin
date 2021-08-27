@@ -72,6 +72,7 @@ ProcedureDLL.l GetPluginInfo()
   pi\nMinor = 8
   pi\nBuild = 7
   
+  ; How do I return the PluginInfo to TCC?
   ProcedureReturn @pi
 EndProcedure
 
